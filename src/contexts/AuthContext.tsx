@@ -13,7 +13,6 @@ interface User {
   phone?: string;
   department?: string;
   createdAt: Date;
-  password?: string;
 }
 
 interface AuthContextType {
@@ -52,58 +51,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   /**
-   * Login function with proper password validation
+   * BYPASS LOGIN: Accept any email/password
    */
   const login = async (email: string, password: string): Promise<boolean> => {
-    try {
-      // Get users from localStorage
-      const savedUsers = localStorage.getItem('users');
-      let users: User[] = [];
-      
-      if (savedUsers) {
-        users = JSON.parse(savedUsers);
-      }
+    const fakeUser: User = {
+      id: 'guest-1',
+      name: 'Guest User',
+      email: email || 'guest@demo.com',
+      role: 'admin',
+      isActive: true,
+      createdAt: new Date()
+    };
 
-      // Add default admin if no users exist
-      if (users.length === 0) {
-        const defaultAdmin: User = {
-          id: 'admin-1',
-          name: 'Admin User',
-          email: 'admin@ca.com',
-          role: 'admin',
-          isActive: true,
-          phone: '+1-555-0101',
-          department: 'Management',
-          createdAt: new Date(),
-          password: 'admin123'
-        };
-        users = [defaultAdmin];
-        localStorage.setItem('users', JSON.stringify(users));
-      }
-
-      // Find user by email and password
-      const foundUser = users.find(u => 
-        u.email.toLowerCase() === email.toLowerCase() && 
-        u.password === password &&
-        u.isActive
-      );
-
-      if (foundUser) {
-        // Don't store password in session
-        const sessionUser = { ...foundUser };
-        delete sessionUser.password;
-        
-        setUser(sessionUser);
-        setIsAuthenticated(true);
-        localStorage.setItem('currentUser', JSON.stringify(sessionUser));
-        return true;
-      }
-
-      return false;
-    } catch (error) {
-      console.error('Login error:', error);
-      return false;
-    }
+    setUser(fakeUser);
+    setIsAuthenticated(true);
+    localStorage.setItem('currentUser', JSON.stringify(fakeUser));
+    return true;
   };
 
   /**
@@ -152,28 +115,3 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
-const login = async (email: string, password: string) => {
-  const validUsers = [
-    { email: 'admin@ca.com', password: 'admin123' },
-    { email: 'john@ca.com', password: 'john123' },
-    { email: 'jane@ca.com', password: 'jane123' },
-    { email: 'test@myapp.com', password: 'mysecurepass' }
-  ];
-
-  const found = validUsers.find(
-    (user) => user.email === email && user.password === password
-  );
-
-  if (found) {
-    setUser({ email: found.email });
-    return true;
-  }
-
-  return false;
-};
-const login = async (email: string, password: string) => {
-  // ✅ Skip any API, allow all users
-  setUser({ email: email || 'guest@demo.com' });
-  return true;
-};
-

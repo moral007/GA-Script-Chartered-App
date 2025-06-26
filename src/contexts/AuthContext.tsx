@@ -34,35 +34,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   /**
-   * Initialize authentication state
+   * Auto-login on load with guest account
    */
   useEffect(() => {
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      try {
-        const userData = JSON.parse(savedUser);
-        setUser(userData);
-        setIsAuthenticated(true);
-      } catch (error) {
-        console.error('Error loading saved user:', error);
-        localStorage.removeItem('currentUser');
-      }
-    }
+    const guestUser: User = {
+      id: 'guest-1',
+      name: 'Guest User',
+      email: 'guest@demo.com',
+      role: 'admin',
+      isActive: true,
+      createdAt: new Date()
+    };
+    setUser(guestUser);
+    setIsAuthenticated(true);
+    localStorage.setItem('currentUser', JSON.stringify(guestUser));
   }, []);
 
   /**
-   * BYPASS LOGIN: Accept any email/password
+   * BYPASS LOGIN: Accept any email/password and switch user
    */
   const login = async (email: string, password: string): Promise<boolean> => {
     const fakeUser: User = {
-      id: 'guest-1',
-      name: 'Guest User',
+      id: 'user-' + Math.random().toString(36).substring(2, 9),
+      name: email.split('@')[0] || 'Guest',
       email: email || 'guest@demo.com',
       role: 'admin',
       isActive: true,
       createdAt: new Date()
     };
-
     setUser(fakeUser);
     setIsAuthenticated(true);
     localStorage.setItem('currentUser', JSON.stringify(fakeUser));
@@ -70,12 +69,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   /**
-   * Logout function
+   * Disable logout for demo mode
    */
   const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('currentUser');
+    console.warn('Logout disabled in demo mode.');
   };
 
   /**

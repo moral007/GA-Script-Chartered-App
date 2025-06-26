@@ -171,3 +171,8 @@ const login = async (email: string, password: string) => {
 
   return false;
 };
+const login = async (email: string, password: string) => {
+  // ✅ Bypass all checks and allow login for any input
+  setUser({ email: email || "guest@demo.com" }); // fallback email if left blank
+  return true;
+};

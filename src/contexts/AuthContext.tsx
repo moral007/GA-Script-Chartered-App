@@ -152,3 +152,22 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
+const login = async (email: string, password: string) => {
+  const validUsers = [
+    { email: 'admin@ca.com', password: 'admin123' },
+    { email: 'john@ca.com', password: 'john123' },
+    { email: 'jane@ca.com', password: 'jane123' },
+    { email: 'test@myapp.com', password: 'mysecurepass' }
+  ];
+
+  const found = validUsers.find(
+    (user) => user.email === email && user.password === password
+  );
+
+  if (found) {
+    setUser({ email: found.email });
+    return true;
+  }
+
+  return false;
+};
